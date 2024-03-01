@@ -26,10 +26,416 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 2587,
   "graphTooltip": 2,
-  "iteration": 1709324823030,
+  "iteration": 1709321265211,
   "links": [],
   "liveNow": false,
   "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 76,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P76A45B24F43298D1"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "displayMode": "auto",
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "id": 135,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.5.21",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P76A45B24F43298D1"
+              },
+              "groupBy": [],
+              "measurement": "browser_http_req_failed",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "url"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "distinct"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "status",
+                  "operator": "!=",
+                  "value": "200"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "301"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "302"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "303"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "307"
+                }
+              ]
+            }
+          ],
+          "title": "Distinct Error Pages",
+          "type": "table"
+        },
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P76A45B24F43298D1"
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 7,
+          "interval": "1s",
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.21",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "Num Errors",
+              "color": "#BF1B00"
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "Num Errors",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P76A45B24F43298D1"
+              },
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "dropped_iterations",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "sum"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Errors Per Second",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P76A45B24F43298D1"
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 78,
+          "interval": "1s",
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.21",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "Num Errors",
+              "color": "#BF1B00"
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "HTTP Errors Per Second",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P76A45B24F43298D1"
+              },
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "none"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "browser_http_req_failed",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "count"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "200"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "301"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "302"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "303"
+                },
+                {
+                  "condition": "AND",
+                  "key": "status",
+                  "operator": "<>",
+                  "value": "307"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "HTTP Errors Per Second",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        }
+      ],
+      "title": "Errors",
+      "type": "row"
+    },
     {
       "collapsed": false,
       "datasource": {
@@ -40,7 +446,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 18,
       "panels": [],
@@ -62,7 +468,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 1
+        "y": 2
       },
       "hiddenSeries": false,
       "id": 1,
@@ -178,7 +584,7 @@
         "h": 7,
         "w": 6,
         "x": 6,
-        "y": 1
+        "y": 2
       },
       "hiddenSeries": false,
       "id": 17,
@@ -228,7 +634,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "http_reqs",
+          "measurement": "browser_http_req_failed",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -237,13 +643,13 @@
             [
               {
                 "params": [
-                  "value"
+                  "url"
                 ],
                 "type": "field"
               },
               {
                 "params": [],
-                "type": "sum"
+                "type": "count"
               }
             ]
           ],
@@ -295,11 +701,11 @@
         "h": 7,
         "w": 6,
         "x": 12,
-        "y": 1
+        "y": 2
       },
       "hiddenSeries": false,
-      "id": 7,
-      "interval": "1s",
+      "id": 133,
+      "interval": ">1s",
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -333,7 +739,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "Num Errors",
+          "alias": "$tag_check",
           "datasource": {
             "type": "influxdb",
             "uid": "P76A45B24F43298D1"
@@ -348,12 +754,18 @@
             },
             {
               "params": [
+                "check"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
                 "none"
               ],
               "type": "fill"
             }
           ],
-          "measurement": "http_req_failed",
+          "measurement": "browser_data_sent",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "C",
@@ -372,42 +784,12 @@
               }
             ]
           ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "<>",
-              "value": "200"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "<>",
-              "value": "301"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "<>",
-              "value": "302"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "<>",
-              "value": "303"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "<>",
-              "value": "307"
-            }
-          ]
+          "tags": []
         }
       ],
       "thresholds": [],
       "timeRegions": [],
-      "title": "Errors Per Second",
+      "title": "Data Sent per Second",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -421,7 +803,7 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "none",
           "logBase": 1,
           "show": true
         },
@@ -450,7 +832,7 @@
         "h": 7,
         "w": 6,
         "x": 18,
-        "y": 1
+        "y": 2
       },
       "hiddenSeries": false,
       "id": 10,
@@ -510,7 +892,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "checks",
+          "measurement": "browser_data_received",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "C",
@@ -534,7 +916,7 @@
       ],
       "thresholds": [],
       "timeRegions": [],
-      "title": "Checks Per Second",
+      "title": "Data Received per Second",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -572,7 +954,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 19,
       "panels": [],
@@ -623,7 +1005,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 9
+        "y": 10
       },
       "id": 11,
       "links": [],
@@ -729,7 +1111,7 @@
         "h": 3,
         "w": 4,
         "x": 4,
-        "y": 9
+        "y": 10
       },
       "id": 14,
       "links": [],
@@ -835,7 +1217,7 @@
         "h": 3,
         "w": 4,
         "x": 8,
-        "y": 9
+        "y": 10
       },
       "id": 15,
       "links": [],
@@ -941,7 +1323,7 @@
         "h": 3,
         "w": 4,
         "x": 12,
-        "y": 9
+        "y": 10
       },
       "id": 16,
       "links": [],
@@ -1047,7 +1429,7 @@
         "h": 3,
         "w": 4,
         "x": 16,
-        "y": 9
+        "y": 10
       },
       "id": 12,
       "links": [],
@@ -1153,7 +1535,7 @@
         "h": 3,
         "w": 4,
         "x": 20,
-        "y": 9
+        "y": 10
       },
       "id": 13,
       "links": [],
@@ -1232,7 +1614,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 12
+        "y": 13
       },
       "height": "250px",
       "hiddenSeries": false,
@@ -1478,7 +1860,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 12
+        "y": 13
       },
       "heatmap": {},
       "height": "250px",
@@ -1508,7 +1890,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "http_req_duration",
+          "measurement": "browser_http_req_duration",
           "orderByTime": "ASC",
           "policy": "default",
           "query": "SELECT \"value\" FROM $Measurement WHERE $timeFilter and value > 0",
@@ -1558,7 +1940,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 86
       },
       "id": 20,
       "panels": [],
@@ -1566,7 +1948,7 @@
       "type": "row"
     }
   ],
-  "refresh": "5s",
+  "refresh": "",
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -1576,10 +1958,10 @@
         "current": {
           "selected": true,
           "tags": [],
-          "text": "http_req_duration + http_req_blocked",
+          "text": "HTTP Request Duration + Time to First Byte",
           "value": [
-            "http_req_duration",
-            "http_req_blocked"
+            "browser_http_req_duration",
+            "browser_web_vital_ttfb"
           ]
         },
         "hide": 0,
@@ -1594,41 +1976,41 @@
           },
           {
             "selected": true,
-            "text": "http_req_duration",
-            "value": "http_req_duration"
+            "text": "HTTP Request Duration",
+            "value": "browser_http_req_duration"
           },
           {
             "selected": true,
-            "text": "http_req_blocked",
-            "value": "http_req_blocked"
+            "text": "Time to First Byte",
+            "value": "browser_web_vital_ttfb"
           },
           {
             "selected": false,
-            "text": "http_req_connecting",
-            "value": "http_req_connecting"
+            "text": "First Contentful Paint",
+            "value": "browser_web_vital_fcp"
           },
           {
             "selected": false,
-            "text": "http_req_looking_up",
-            "value": "http_req_looking_up"
+            "text": "Responsiveness - Interaction to Next Paint",
+            "value": "browser_web_vital_inp"
           },
           {
             "selected": false,
-            "text": "http_req_receiving",
-            "value": "http_req_receiving"
+            "text": "Load Perf. - Largest Contentful Paint",
+            "value": "browser_web_vital_lcp"
           },
           {
             "selected": false,
-            "text": "http_req_sending",
-            "value": "http_req_sending"
+            "text": "Interactivity - First Input Delay",
+            "value": "browser_web_vital_fid"
           },
           {
             "selected": false,
-            "text": "http_req_waiting",
-            "value": "http_req_waiting"
+            "text": "Visual Stability - Cumulative Layout Shift",
+            "value": "browser_web_vital_cls"
           }
         ],
-        "query": "http_req_duration,http_req_blocked,http_req_connecting,http_req_looking_up,http_req_receiving,http_req_sending,http_req_waiting",
+        "query": "browser_http_req_duration,browser_web_vital_fcp,browser_web_vital_inp,browser_web_vital_lcp,browser_web_vital_fid,browser_web_vital_cls,browser_web_vital_ttfb",
         "skipUrlSync": false,
         "type": "custom"
       }
@@ -1664,8 +2046,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "k6 Load Testing Results",
-  "uid": "k6",
-  "version": 2,
+  "title": "k6 Browser Load Testing Results",
+  "uid": "k6b",
+  "version": 21,
   "weekStart": ""
 }
