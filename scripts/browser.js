@@ -1,20 +1,13 @@
-import { browser, check } from 'k6/experimental/browser';
-import { sleep, fail } from 'k6';
+import http from 'k6/http';
+import { check, sleep, fail } from 'k6';
+import { parseHTML } from 'k6/html';
 
 export let options = {
-  scenarios: {
-    ui: {
-      executor: 'shared-iterations',
-      vus: 30,
-      iterations: 23430,
-      maxDuration: '10m',
-      options: {
-        browser: {
-          type: 'chromium',
-        },
-      },
-    },
-  },
+  stages: [
+    { duration: '1m', target: 30 },
+    { duration: '5m', target: 30 },
+    { duration: '5m', target: 0}
+  ],
 };
 
 const BASE_URL = __ENV.BASE_URL;
@@ -34,69 +27,137 @@ const ADMIN_URLS = [
   '/user/logout',
 ];
 
-export default async function () {
-  const browserContext = browser.newContext({
-    viewport: { width: 1280, height: 720 },
-    ignoreHTTPSErrors: true,
+function extractFormBuildId(body) {
+  // Use regex to extract the form_build_id
+  let formBuildIdMatch = body.match(/name="form_build_id" value="([^"]+)"/);
+  return formBuildIdMatch ? formBuildIdMatch[1] : null;
+}
+
+function retryRequest(method, url, body, params = {}) {
+  let retries = 5, delay = 0;
+  params.timeout = 20000;
+
+  for (let i = 0; i < retries; i++) {
+    let response;
+    if (method === 'GET') {
+      response = http.get(url, params);
+    } else if (method === 'POST') {
+      response = http.post(url, body, params);
+    } else {
+      throw new Error('Unsupported HTTP method');
+    }
+
+    if (response.status !== 0) {
+      return response; // Success, return the response
+    }
+
+    // Log the retry info
+    console.log(`Request to ${url} failed with status ${response.status}. Retry attempt #${i + 1}`);
+
+    // If not the last attempt, sleep before retrying
+    if (i < retries - 1) {
+      sleep(delay);
+    }
+  }
+  fail(`Request to ${url} failed after ${retries} retries`);
+}
+
+export default function () {
+  // Fetch login page to get CSRF token
+  let loginPageRes = retryRequest('GET', `${BASE_URL}/user/login`, null);
+  let formBuildId = extractFormBuildId(loginPageRes.body);
+
+  // Check if formBuildId was found
+  if (!formBuildId) {
+    console.error('Unable to find form_build_id on login page');
+    return;
+  }
+
+  // Prepare login request
+  let loginParams = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirects: 0, // do not follow redirects
+  };
+
+  // Login payload
+  let loginPayload = {
+    name: USERNAME,
+    pass: PASSWORD,
+    form_id: 'user_login_form',
+    form_build_id: formBuildId, // Include the extracted form_build_id
+  };
+
+  // Send login POST request
+  let loginRes = retryRequest('POST', `${BASE_URL}/user/login`, loginPayload, loginParams);
+
+  // Manually handle the redirect and capture the cookie
+  let cookies = loginRes.cookies;
+  let sessionCookieName = Object.keys(cookies)[0]; // Replace with actual session cookie name if known
+  let sessionCookieValue = cookies[sessionCookieName][0].value;
+
+  // Check if the login was successful by looking for the Set-Cookie header
+  if (
+    !check(loginRes, {
+      'is status 303': (r) => r.status === 303,
+    })
+  ) {
+    fail('status code was ' + loginRes.status + ' *not* 303');
+  }
+
+  if (
+    !check(loginRes, {
+      'cookie is set': (r) => sessionCookieValue !== undefined,
+    })
+  ) {
+    fail('cookie was not set');
+  }
+
+  if (!sessionCookieValue) {
+    console.error('Login did not set a session cookie.');
+    return;
+  }
+
+  // Manually follow the redirect with the session cookie
+  // Check if the Location header contains a full URL or a path
+  let redirectUrl = loginRes.headers.Location;
+  if (!redirectUrl.startsWith('http')) {
+    // If it's not a full URL, prepend with BASE_URL
+    redirectUrl = `${BASE_URL}${redirectUrl}`;
+  }
+
+  let homePageRes = retryRequest('GET', redirectUrl, null, {
+    headers: {
+      Cookie: `${sessionCookieName}=${sessionCookieValue}`,
+    },
   });
-  browserContext.setDefaultTimeout(1000);
-  const page = browserContext.newPage();
 
-  try {
-    // Navigate to the login page
-    let result = await page.goto(`${BASE_URL}/user/login`);
+  if (!check(homePageRes, {
+    'arrived at home page': (r) => r.status === 200,
+  }))
+  {
+    fail('status code was *not* 200');
+  }
 
-    //console.log(result.status());
+  // Sleep a bit before visiting admin URLs
+  sleep(1);
 
-    console.log("reached login page");
-
-    // Fill in the login form
-    page.fill('input[name="name"]', USERNAME);
-    page.fill('input[name="pass"]', PASSWORD);
-
-    //page.screenshot({ path: '/scripts/01_screenshot.png' });
-
-    // Submit the login form and wait for navigation
-    await Promise.all([
-      page.waitForNavigation('domcontentloaded'),
-      page.click('input[id="edit-submit"]'),
-    ]);
-
-    //page.screenshot({ path: '/scripts/02_screenshot.png' });
-
-    console.log("clicked submit login");
-
-    // Check if the login was successful
-    if (
-      !check(page.url().includes('/user/'), {
-        'is status 200': (r) => r.status === 200,
+  ADMIN_URLS.forEach((adminPath) => {
+    let adminRes = retryRequest('GET', `${BASE_URL}${adminPath}`, null, {
+      headers: {
+        Cookie: `${sessionCookieName}=${sessionCookieValue}`,
+      },
+    });
+    if (!
+      check(adminRes, {
+        [`visited ${adminPath}`]: (resp) => resp.status === 200,
       })
     ) {
-      console.error('Login failed, unable to find user page in URL.');
-      fail('Login failed');
+      fail(adminPath + ' status code was *not* 200');
     }
+    // Sleep some time between admin page visits
+    sleep(1);
+  });
 
-    console.log("at /user/");
-
-    // Visit the admin URLs
-    for (const adminPath of ADMIN_URLS) {
-      await page.goto(`${BASE_URL}${adminPath}`);
-      //page.screenshot({ path: '/scripts/03_'+adminPath.replace(/\//g,'')+'_screenshot.png' });
-
-      console.log(`at ${adminPath}`);
-      // let response = await page.waitForNavigation('domcontentloaded'); // Wait for the network to be idle
-      // const status = response.status(); // Get the HTTP status code of the navigation
-      
-      // if (status !== 200) {
-      //   fail(`Expected HTTP 200 for ${adminPath}, got ${status}`);
-      // }
-
-      // Sleep some time between admin page visits
-      sleep(1);
-    }
-  } finally {
-    // Close the page and browser context
-    await page.close();
-    await browserContext.close();
-  }
 }

@@ -11,6 +11,9 @@ PASSWORD=""
 docker-compose up -d influxdb grafana
 docker-compose run k6 run /scripts/regular.js
 
+Cleanup with this when done:
+docker rm $(docker ps -q -a -f status=exited --filter name=dockerk6 | xargs)
+
 ## Wild Goosechase with K6 and Docker
 In a very particular set of circumstances, Docker networking fails intermittently. The symptom is occasional “dial i/o timeout”-errors on egress connections (leaving the container environment, docker-to-host/remote and docker-to-docker via host.docker.internal). The observed behavior is very similar to the issue described in https://github.com/docker/for-win/issues/8861.
 

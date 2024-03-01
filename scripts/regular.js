@@ -14,7 +14,6 @@ const BASE_URL = __ENV.BASE_URL;
 const USERNAME = __ENV.USERNAME;
 const PASSWORD = __ENV.PASSWORD;
 const ADMIN_URLS = [
-  '/user/2',
   '/node/1',
   '/admin/content',
   '/admin/people',
@@ -36,7 +35,7 @@ function extractFormBuildId(body) {
 
 function retryRequest(method, url, body, params = {}) {
   let retries = 5, delay = 0;
-  params.timeout = 20000;
+  params.timeout = 5000;
 
   for (let i = 0; i < retries; i++) {
     let response;
@@ -48,7 +47,7 @@ function retryRequest(method, url, body, params = {}) {
       throw new Error('Unsupported HTTP method');
     }
 
-    if (response.status >= 200 && response.status < 400) {
+    if (response.status !== 0) {
       return response; // Success, return the response
     }
 

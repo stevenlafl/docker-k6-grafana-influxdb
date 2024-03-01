@@ -50,5 +50,5 @@ services:
       - PASSWORD=${PASSWORD}
     volumes:
       - ./scripts:/scripts
-    dns:
-      - 8.8.8.8
+    extra_hosts:
+      - "drupal.k3s.rocksthe.net:10.23.23.251"
